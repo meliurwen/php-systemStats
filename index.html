@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="css/w3.css">
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<title>Eracolatore</title>
+<style>
+
+/*Main Structre*/
+header {background: black;color:white;}
+footer {background: #aaa;color:white;}
+.flex-container {display: -webkit-flex; display: flex; -webkit-flex-flow: row wrap; flex-flow: row wrap; text-align: center;}
+.flex-container > * {padding: 15px; -webkit-flex: 1 100%; flex: 1 100%;}
+.article {text-align: left;}
+.nav {background:#eee;}
+.nav ul {list-style-type: none; padding: 0;}
+.nav ul a {text-decoration: none;}
+@media all and (min-width: 768px) {
+	.nav {text-align:left;-webkit-flex: 0 auto;flex:0 auto;-webkit-order:1;order:1;}
+	.article {-webkit-flex:5 0px;flex:5 0px;-webkit-order:2;order:2;}
+	footer {-webkit-order:3;order:3;}
+}
+
+/*Footer Text*/
+.default{
+	opacity:0.5;
+	-webkit-transition: all 0.2s ease-in-out;
+	-moz-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+}
+.default:hover{
+	opacity:1;
+	-webkit-transition: all 0.2s ease-in-out;
+	-moz-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+}
+.copyleft {
+	display:inline-block;
+	transform: rotate(180deg);
+}
+
+/*Navbar*/
+.navSinistra{padding-left: 7px; margin: 0 !important; clear: both;}
+.navVoiceSx{float: left;}
+.navVoiceDx{float: right; padding-right: 6px;}
+
+/*Boxes*/
+.city{float: left; margin: 10px; padding: 10px; width: 300px; height: 300px; border: 1px solid black;}
+.boxIcon{text-align: center; margin-bottom: -20px;}
+.boxTitle{text-align: center;}
+.boxVoiceSx{margin: 0 !important;}
+.boxVoiceSxIndented{margin: 0 !important; font-size: 70%; padding-left: 30px;}
+.boxVoiceDx{float: right;}
+.tronca{float: left; width: 105px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+
+</style>
+
+</head>
+<body>
+	<div class="flex-container">
+		<header>
+			<h1>Eracolatore</h1>
+		</header>
+
+		<nav class="nav">
+			<h3>Quick Report</h3>
+			<small><b>Services</b></small>
+			<p class="navSinistra"><span class="navVoiceSx">Transmission</span><span class="navVoiceDx" id="services.transmission" preproc="bool"></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">Openvpn</span><span class="navVoiceDx" id="services.openvpn" preproc="bool"></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">Teamspeak3</span><span class="navVoiceDx" id="services.ts3server" preproc="bool"></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">Gobby</span><span class="navVoiceDx" id="services.infinoted" preproc="bool"></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">Starbound</span><span class="navVoiceDx" id="services.starbound" preproc="bool"></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">Minecraft</span><span class="navVoiceDx" id="services.minecraft" preproc="bool"></span></p>
+			<br />
+			<small><b>Resources</b></small>
+			<p class="navSinistra"><span class="navVoiceSx">CPU</span><span class="navVoiceDx" id="cpuTotalPercent"></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">RAM</span><span class="navVoiceDx"><span id="resources.ram.used" preproc="formatBytes"></span>/<span id="resources.ram.total" preproc="formatBytes"></span></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">sda2</span><span class="navVoiceDx"><span id="sda2UsedSpace"></span>/<span id="resources.disk.sda.sda2.totalSectors" preproc="formatSectors"></span></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">┗ R-W</span><span class="navVoiceDx"><span id="sdaReadSpeed"></span> - <span id="sdaWriteSpeed"></span></span></p>
+			<p class="navSinistra"><span class="navVoiceSx">Uptime</span><span class="navVoiceDx" id="resources.uptime" preproc="secondsToDhms"></span></p>
+			<br />
+			<small><b>Network (eth0)</b></small>
+			<p class="navSinistra"><span class="navVoiceSx">Total</span><span class="navVoiceDx"><span id="resources.network.eth0.total.tx" preproc="formatBytes"></span>🠙/<span id="resources.network.eth0.total.rx" preproc="formatBytes"></span>🠛</span></p>
+			<p class="navSinistra"><span class="navVoiceSx">Speed</span><span class="navVoiceDx"><span id="eth0UpSpeed"></span>🠙/<span id="eth0DownSpeed"></span>🠛</span></p>
+			<p class="navSinistra"><span class="navVoiceSx">IPv4 ext</span><span class="navVoiceDx">133.152.215.237</span></p>
+			<p class="navSinistra"><span class="navVoiceSx">IPv4 int</span><span class="navVoiceDx">192.168.150.115</span></p>
+			<p class="navSinistra"><span class="navVoiceSx">MAC</span><span class="navVoiceDx">00:1C:B3:09:85:15</span></p>
+			<p class="navSinistra"><span class="navVoiceSx">Link speed</span><span class="navVoiceDx">100Mbps</span></p>
+
+			<table style="border: none;margin-left: auto;margin-right: auto;">
+				<tr><td style="width: 260px;"></td></tr>
+			</table>
+		</nav>
+
+		<article class="article">
+			<h1>Pannello</h1>
+
+			<a href="#">
+				<div class="city">
+					<div class="boxIcon"><img src="icons/Transmission-icon-two-colors_128x128.png" alt="Transmission" width="48" height="48"></div>
+					<h2 class="boxTitle">Transmission</h2>
+					<p class="boxVoiceSx">Up<span class="boxVoiceDx" id="transmissionUpSpeed"></span></p>
+					<p class="boxVoiceSx">Down<span class="boxVoiceDx" id="transmissionDownSpeed"></span></p>
+					<p class="boxVoiceSx">Uptime<span class="boxVoiceDx" id="applications.transmission.uptime" preproc="secondsToDhms"></span></p>
+					<p class="boxVoiceSx">Started<span class="boxVoiceDx" id="applications.transmission.started" preproc="timesString"></span></p>
+					<p class="boxVoiceSx">Total up<span class="boxVoiceDx" id="applications.transmission.upTotal" preproc="formatBytes"></span></p>
+					<p class="boxVoiceSx">Total down<span class="boxVoiceDx" id="applications.transmission.downTotal" preproc="formatBytes"></span></p>
+					<p class="boxVoiceSx">Total uptime<span class="boxVoiceDx" id="applications.transmission.uptimeTotal" preproc="secondsToDhms"></span></p>
+					<p class="boxVoiceSx">Seed ratio<span class="boxVoiceDx" id="seedRatio"></span></p>
+				</div>
+			</a>
+
+			<a href="#">
+				<div class="city">
+					<div class="boxIcon"><img src="icons/openvpn_logo_128x128.png" alt="OpenVPN" width="48" height="48"></div>
+					<h2 class="boxTitle">Openvpn</h2>
+					<p class="boxVoiceSx">Online users<span class="boxVoiceDx" id="applications.openvpn.onlineUsers"></span></p>
+					<p class="boxVoiceSx">Up<span class="boxVoiceDx" id="tun0UpSpeed"></span></p>
+					<p class="boxVoiceSx">Down<span class="boxVoiceDx" id="tun0DownSpeed"></span></p>
+					<p class="boxVoiceSx">Uptime<span class="boxVoiceDx" id="applications.openvpn.uptime" preproc="secondsToDhms"></span></p>
+					<p class="boxVoiceSx">Session up<span class="boxVoiceDx" id="resources.network.tun0.total.tx" preproc="formatBytes"></span></p>
+					<p class="boxVoiceSx">Session down<span class="boxVoiceDx" id="resources.network.tun0.total.rx" preproc="formatBytes"></span></p>
+				</div>
+			</a>
+
+			<a href="#">
+				<div class="city">
+					<div class="boxIcon"><img src="icons/teamspeak_logo_black_128x128.png" alt="TeamSpeak3" width="48" height="48"></div>
+					<h2 class="boxTitle">Pi-Hole</h2>
+					<p class="boxVoiceSx">Online users<span class="boxVoiceDx">3</span></p>
+					<p class="boxVoiceSx">Up<span class="boxVoiceDx">518kB/s</span></p>
+					<p class="boxVoiceSx">Down<span class="boxVoiceDx">1022kB/s</span></p>
+					<p class="boxVoiceSx">Uptime<span class="boxVoiceDx">54g13h15m32s</span></p>
+					<p class="boxVoiceSx">Session up<span class="boxVoiceDx">515GB</span></p>
+					<p class="boxVoiceSx">Session down<span class="boxVoiceDx">265GB</span></p>
+				</div>
+			</a>
+
+			<a href="#">
+				<div class="city">
+					<div class="boxIcon"><img src="icons/teamspeak_logo_black_128x128.png" alt="TeamSpeak3" width="48" height="48"></div>
+					<h2 class="boxTitle">TeamSpeak3</h2>
+					<p class="boxVoiceSx">Online users<span class="boxVoiceDx">3</span></p>
+					<p class="boxVoiceSx">Up<span class="boxVoiceDx">518kB/s</span></p>
+					<p class="boxVoiceSx">Down<span class="boxVoiceDx">1022kB/s</span></p>
+					<p class="boxVoiceSx">Uptime<span class="boxVoiceDx">54g13h15m32s</span></p>
+					<p class="boxVoiceSx">Session up<span class="boxVoiceDx">515GB</span></p>
+					<p class="boxVoiceSx">Session down<span class="boxVoiceDx">265GB</span></p>
+				</div>
+			</a>
+
+			<a href="#">
+				<div class="city">
+					<div class="boxIcon"><img src="icons/vps_128x128.png" alt="Server VPS" width="48" height="48"></div>
+					<h2 class="boxTitle">VPS</h2>
+					<p class="boxVoiceSx">Online users<span class="boxVoiceDx">2</span></p>
+					<p class="boxVoiceSx">Login failed attempts (24h)<span class="boxVoiceDx">1532</span></p>
+					<div style="float: left; width: 100%; font-size: 70%;">
+						<p style="margin: 0 !important; text-align: center;"><b>Last Logged Users</b></p>
+						<p class="boxVoiceSx"><span class="tronca">melime</span><span class="boxVoiceDx">16-09-11@22:05CET</span></p>
+						<p class="boxVoiceSx"><span class="tronca">gianfrancioschio</span><span class="boxVoiceDx">16-09-11@22:05CET</span></p>
+						<p class="boxVoiceSx"><span class="tronca">uiArAnonimus</span><span class="boxVoiceDx">16-09-11@22:05CET</span></p>
+					</div>
+					<div style="float: left; width: 50%; font-size: 70%;">
+						<p style="margin: 0 !important; text-align: center;"><b>Top 3 RAM usage</b></p>
+						<p class="boxVoiceSx"><span class="tronca">starbound_server</span><span class="boxVoiceDx">287M</span></p>
+						<p class="boxVoiceSx"><span class="tronca">java</span><span class="boxVoiceDx">125M</span></p>
+						<p class="boxVoiceSx"><span class="tronca">transmission-daemon</span><span class="boxVoiceDx">125M</span></p>
+					</div>
+					<div style="float: right; width: 50%; font-size: 70%;border-left-style: dotted; border-left-width: 1px;">
+						<p style="margin: 0 !important; text-align: center;"><b>Top 3 CPU usage (%)</b></p>
+						<p class="boxVoiceSx"><span class="tronca">starbound_server</span><span class="boxVoiceDx">3.1</span></p>
+						<p class="boxVoiceSx"><span class="tronca">transmission-daemon</span><span class="boxVoiceDx">2.4</span></p>
+						<p class="boxVoiceSx"><span class="tronca">ts3server</span><span class="boxVoiceDx">1.2</span></p>
+					</div>
+				</div>
+			</a>
+
+			<a href="#">
+				<div class="city">
+					<div class="boxIcon"><img src="icons/minecraft_128x128.png" alt="Minecraft" width="48" height="48"></div>
+					<h2 class="boxTitle">Minecraft</h2>
+					<p class="boxVoiceSx">Online players<span class="boxVoiceDx">3</span></p>
+					<p class="boxVoiceSx">Uptime<span class="boxVoiceDx">54g13h15m32s</span></p>
+					<p class="boxVoiceSx">World<span class="boxVoiceDx">eracolatore</span></p>
+					<p class="boxVoiceSx">Game mode<span class="boxVoiceDx">survival</span></p>
+					<p class="boxVoiceSx">Mods<span class="boxVoiceDx">0</span></p>
+					<p class="boxVoiceSx">Ingame days<span class="boxVoiceDx">52</span></p>
+					<p class="boxVoiceSx">Ingame time<span class="boxVoiceDx">15:44</span></p>
+				</div>
+			</a>
+
+			<a href="#">
+				<div class="city">
+					<div class="boxIcon"><img src="icons/internet_128x128.png" alt="Servizi Esterni" width="48" height="48"></div>
+					<h2 class="boxTitle">Servizi Esterni</h2>
+					<p class="boxVoiceSx">Servizio 1<span class="boxVoiceDx">⬤</span></p>
+					<p class="boxVoiceSx">Servizio 2<span class="boxVoiceDx">◯</span></p>
+					<p class="boxVoiceSx">Servizio 3<span class="boxVoiceDx">⬤</span></p>
+						<p class="boxVoiceSxIndented">Servizio 3.1<span class="boxVoiceDx">⬤</span></p>
+						<p class="boxVoiceSxIndented">Servizio 3.2<span class="boxVoiceDx">⬤</span></p>
+						<p class="boxVoiceSxIndented">Servizio 3.3<span class="boxVoiceDx">◯</span></p>
+					<p class="boxVoiceSx">Servizio 4<span class="boxVoiceDx">⬤</span></p>
+					<p class="boxVoiceSx">Servizio 5<span class="boxVoiceDx">⬤</span></p>
+				</div>
+			</a>
+		</article>
+
+		<footer><span class="default">Copyleft GPL <span class="copyleft">©</span> Melime</div></div></footer>
+	</div>
+
+
+</body>
+
+
+
+<script>
+
+//Dichiarazione variabili sul calcolo della velocità
+var eth0UpTotal0;
+var eth0DownTotal0;
+var tun0UpTotal0;
+var tun0DownTotal0;
+var sdaReadTotal0;
+var sdaWriteTotal0;
+var transmissionUpTotal0;
+var transmissionDownTotal0;
+var tempo0;
+var totalUptimeTransmission0;
+
+//CPU usage variables
+var cpuUser0 = new Array();
+var cpuNice0 = new Array();
+var cpuSystem0 = new Array();
+var cpuIdle0 = new Array();
+var cpuIowait0 = new Array();
+var cpuIrq0 = new Array();
+var cpuSoftirq0 = new Array();
+var cpuSteal0 = new Array();
+var cpuGuest0 = new Array();
+var cpuGuestNice0 = new Array();
+
+
+
+
+
+var tempoCalcolato;
+
+
+$(document).ready(function(){
+	robbeh();
+	var myVar = setInterval(robbeh, 5000);
+});
+
+
+
+function robbeh(){
+	$.getJSON("api.php", function(obj){
+		cattiva(obj, "");
+
+
+
+		document.getElementById("sda2UsedSpace").innerHTML = formatBytes((obj.resources.disk.sda.sda2.totalSectors - obj.resources.disk.sda.sda2.freeSectors)*512);
+		document.getElementById("seedRatio").innerHTML = (obj.applications.transmission.upTotal / obj.applications.transmission.downTotal).toFixed(2);
+
+
+
+
+
+
+document.getElementById("cpuTotalPercent").innerHTML = cpuTotalPercent(obj.resources.cpu);
+
+
+
+
+
+
+
+		//Calcolo velocità
+		if((obj.timeUnixUtcMilliseconds - tempo0) != 0){
+			tempoCalcolato = (obj.timeUnixUtcMilliseconds - tempo0)/1000;
+			document.getElementById("eth0UpSpeed").innerHTML = formatBytesSpeed(Math.round(((obj.resources.network.eth0.total.tx - eth0UpTotal0)/tempoCalcolato)));
+			document.getElementById("eth0DownSpeed").innerHTML = formatBytesSpeed(Math.round(((obj.resources.network.eth0.total.rx - eth0DownTotal0)/tempoCalcolato)));
+			document.getElementById("tun0UpSpeed").innerHTML = formatBytesSpeed(Math.round(((obj.resources.network.tun0.total.tx - tun0UpTotal0)/tempoCalcolato)));
+			document.getElementById("tun0DownSpeed").innerHTML = formatBytesSpeed(Math.round(((obj.resources.network.tun0.total.rx - tun0DownTotal0)/tempoCalcolato)));
+			document.getElementById("sdaReadSpeed").innerHTML = formatSectorsSpeed(Math.round(((obj.resources.disk.sda.readTotalSectors - sdaReadTotal0)/tempoCalcolato)));
+			document.getElementById("sdaWriteSpeed").innerHTML = formatSectorsSpeed(Math.round(((obj.resources.disk.sda.writeTotalSectors - sdaWriteTotal0)/tempoCalcolato)));
+			if((obj.applications.transmission.uptimeTotal - totalUptimeTransmission0) != 0){
+				document.getElementById("transmissionUpSpeed").innerHTML = formatBytesSpeed(Math.round(((obj.applications.transmission.upTotal - transmissionUpTotal0)/tempoCalcolato)));
+				document.getElementById("transmissionDownSpeed").innerHTML = formatBytesSpeed(Math.round(((obj.applications.transmission.downTotal - transmissionDownTotal0)/tempoCalcolato)));
+				transmissionUpTotal0 = obj.applications.transmission.upTotal;
+				transmissionDownTotal0 = obj.applications.transmission.downTotal;
+				totalUptimeTransmission0 = obj.applications.transmission.uptimeTotal;
+			}
+
+			eth0UpTotal0 = obj.resources.network.eth0.total.tx;
+			eth0DownTotal0 = obj.resources.network.eth0.total.rx;
+			tun0UpTotal0 = obj.resources.network.tun0.total.tx;
+			tun0DownTotal0 = obj.resources.network.tun0.total.rx;
+			sdaReadTotal0 = obj.resources.disk.sda.readTotalSectors;
+			sdaWriteTotal0 = obj.resources.disk.sda.writeTotalSectors;
+			tempo0 = obj.timeUnixUtcMilliseconds;
+		}
+
+	});
+}
+
+
+
+function cattiva(dict, prefix){
+	for (var chiave in dict) {
+		if (dict[chiave].constructor == Object){
+			//caso ricorsivo
+			cattiva(dict[chiave], prefix + chiave + ".")
+		} else {
+			//foglia
+			try {
+				var el = document.getElementById(prefix + chiave)
+				var t = el.getAttribute("preproc")
+				var data = dict[chiave]
+				if (t != null){
+					t = t.split(" ")
+					for(word in t) {
+						var func = preproc[t[word]]
+						data = func(data)
+					}
+				}
+				el.innerHTML = data
+			} catch (e){
+				console.log("elemento " + prefix + chiave + " non trovato.");
+				console.log(e);
+			}
+		}
+	}
+}
+
+
+var preproc = {
+	"bool" : function(x) {if (x == true){return "⬤";}return "◯";},
+
+	"formatBytes" : function(x){return formatBytes(x);},
+
+	"formatSectors" : function(x){return formatSectors(x);},
+
+	"secondsToDhms" : function(x){return secondsToDhms(x);},
+
+	"timesString" : function(x){if (x == 1)return x + " time";return x + " times";}
+
+}
+
+
+
+function formatBytes(bytes) {
+   var sizes = ['Bytes', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+   if (bytes == 0) return '0 Byte';
+   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+   return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + sizes[i];
+};
+
+
+function formatBytesSpeed(bytes) {
+   var sizes = ['Bytes/s', 'kB/s', 'MB/s', 'GB/s', 'TB/s', 'PB/s', 'EB/s', 'ZB/s', 'YB/s'];
+   if (bytes == 0) return '0 Bytes/s';
+   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+   return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + sizes[i];
+};
+
+//In almost all systems the sector size is 512bytes
+function formatSectors(sectors){return formatBytes(sectors*512);}
+function formatSectorsSpeed(sectors){return formatBytesSpeed(sectors*512);}
+
+
+
+function secondsToDhms(time) {
+time = Number(time);
+var d = Math.floor(time / 86400);
+var h = Math.floor(time % 86400 / 3600);
+var m = Math.floor(time % 3600 / 60);
+var s = Math.floor(time % 3600 % 60);
+return ((d > 0 ? d + "d" : "")+(h > 0 ? h + "h" : "") + (m < 10 & m != 0 ? "0" + m + "m" : "") + (m >= 10 ? m + "m" : "") + (s < 10 ? "0" : "") + s + "s"); }
+
+
+
+
+
+
+
+
+function cpuTotalPercent(cpuArray){
+
+//Conto il numero degli oggetti array dentro l'array Socket
+var numCores = 0;
+while(cpuArray[numCores]){numCores++;}
+//Aggiungo 1 perchè il while parte a contare da zero
+numCores++;
+
+
+
+var sockets = cpuArray.length;
+var coresPerSocket = numCores;
+var threadsPerCore = cpuArray[0][0].length;
+
+
+
+/*
+Idle0 = idle0 + iowait0
+Idle = idle + iowait
+
+NonIdle0 = user0 + nice0 + system0 + irq0 + softirq0 + steal0
+NonIdle = user + nice + system + irq + softirq + steal
+
+Total0 = Idle0 + NonIdle0
+Total = Idle + NonIdle
+
+# differentiate: actual value minus the previous one
+totald = Total - Total0
+idled = Idle - Idle0
+
+CPU_Percentage = (totald - idled)/totald
+
+(((idle + iowait) + (user + nice + system + irq + softirq + steal)) - ((idle0 + iowait0) + (user0 + nice0 + system0 + irq0 + softirq0 + steal0)) - ((idle + iowait) - (idle0 + iowait0)) ) / ((idle + iowait) + (user + nice + system + irq + softirq + steal)) - ((idle0 + iowait0) + (user0 + nice0 + system0 + irq0 + softirq0 + steal0))
+
+*/
+
+var totalThreads = sockets * coresPerSocket * threadsPerCore;
+//Prealloco lo spazio sull'array
+for(thrd = 0; thrd < totalThreads; thrd++){
+	cpuNice0.push(0);
+}
+
+
+
+atThread = 0;
+cpuCumulativePercentage = 0;
+for(a = 0; a < sockets; a++){
+
+	for(b = 0; b < coresPerSocket; b++){
+
+		for(c = 0; c < threadsPerCore; c++){
+
+		cpuCumulativePercentage = cpuCumulativePercentage + ((((cpuArray[a][b][c]['user'] + cpuArray[a][b][c]['nice'] + cpuArray[a][b][c]['system'] + cpuArray[a][b][c]['irq'] + cpuArray[a][b][c]['softirq'] + cpuArray[a][b][c]['steal'])) - ((cpuUser0[atThread] + cpuNice0[atThread] + cpuSystem0[atThread] + cpuIrq0[atThread] + cpuSoftirq0[atThread] + cpuSteal0[atThread]))) / (((cpuArray[a][b][c]['idle'] + cpuArray[a][b][c]['iowait']) + (cpuArray[a][b][c]['user'] + cpuArray[a][b][c]['nice'] + cpuArray[a][b][c]['system'] + cpuArray[a][b][c]['irq'] + cpuArray[a][b][c]['softirq'] + cpuArray[a][b][c]['steal'])) - ((cpuIdle0[atThread] + cpuIowait0[atThread]) + (cpuUser0[atThread] + cpuNice0[atThread] + cpuSystem0[atThread] + cpuIrq0[atThread] + cpuSoftirq0[atThread] + cpuSteal0[atThread]))));
+
+
+cpuUser0[atThread] = cpuArray[a][b][c]['user'];
+cpuNice0[atThread] = cpuArray[a][b][c]['nice'];
+cpuSystem0[atThread] = cpuArray[a][b][c]['system'];
+cpuIdle0[atThread] = cpuArray[a][b][c]['idle'];
+cpuIowait0[atThread] = cpuArray[a][b][c]['iowait'];
+cpuIrq0[atThread] = cpuArray[a][b][c]['irq'];
+cpuSoftirq0[atThread] = cpuArray[a][b][c]['softirq'];
+cpuSteal0[atThread] = cpuArray[a][b][c]['steal'];
+cpuGuest0[atThread] = cpuArray[a][b][c]['guest'];
+cpuGuestNice0[atThread] = cpuArray[a][b][c]['guestNice'];
+
+atThread++;
+
+		}
+
+	}
+
+
+}
+
+
+
+
+
+
+return  cpuCumulativePercentage / totalThreads;
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+
+
+</html>
